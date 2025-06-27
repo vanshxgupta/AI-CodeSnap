@@ -1,37 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 CodeSnap — AI-Powered Wireframe to Code Converter
 
-## Getting Started
+CodeSnap is a full-stack AI-powered application that instantly converts wireframes or design descriptions into clean, production-ready React/HTML,CSS Code, Ideal for developers, designers, and startups looking to streamline UI prototyping and accelerate development.
 
-First, run the development server:
+
+## 🚀 Features
+
+- ✨ **AI Design-to-Code Conversion** — Upload wireframes or enter UI descriptions to generate responsive React + Tailwind UI.
+- 🔐 **Authentication** — Seamless auth flow using Google Sign-In.
+- 💳 **Credits System** — Daily free credits for fair usage.
+- 💾 **Persistent Code Storage** — Save and revisit your generated UIs anytime.
+- 📦 **Built-in Editor** — Live preview and code editor using Sandpack.
+- 🎨 **Dark Mode Support** — Developer-friendly interface, day or night.
+
+---
+
+## 🛠️ Tech Stack
+
+| Tech                  | Role                             |
+|-----------------------|----------------------------------|
+| **Next.js 14**        | App framework                    |
+| **TypeScript**        | Type safety                      |
+| **Tailwind CSS**      | Utility-first styling            |
+| **Drizzle ORM**       | Database management              |
+| **PostgreSQL**        | Primary database                 |
+| **OpenAI API**        | Code generation engine           |
+| **Clerk/Auth**        | Authentication (if used)         |
+| **Sandpack**          | Embedded code editor             |
+| **Vercel**            | Deployment platform              |
+
+---
+
+## 📸 Preview
+
+| Upload Wireframe           | Get Clean React Code         |
+|----------------------------|------------------------------|
+| ![](./public/wireframe.png)| ![](./public/output-code.png)|
+
+---
+
+## 🧑‍💻 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/codesnap.git
+cd codesnap
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Setup environment variables
+
+Create a `.env.local` file and add the following:
+
+```env
+OPENAI_API_KEY=your-openai-key
+DATABASE_URL=your-postgresql-url
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+> _Ensure your PostgreSQL DB is running and connected via Drizzle ORM._
+
+### 4. Push your schema with Drizzle
+
+```bash
+npx drizzle-kit push
+```
+
+### 5. Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Folder Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+├── app/
+│   ├── _components/           # UI Components (Sidebar, Header, etc.)
+│   ├── api/                   # Server-side API routes (OpenAI, DB updates)
+│   ├── provider.tsx           # Auth/Context Providers
+├── configs/
+│   ├── db.ts                  # Drizzle DB config
+│   ├── schema.ts              # Drizzle schema definitions
+├── data/Constants.ts          # Static values (Models, Prompts)
+├── public/                    # Static assets (logo, banners)
+├── .env.local                 # Local env vars
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📈 Future Plans
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [ ] Support for multi-page design flows
+- [ ] Integrate with Figma API
+- [ ] Export to Vue/Svelte code
+- [ ] Referral & monetization system
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🌐 Live Demo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> Coming soon:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# AI-CodeSnap
+> Designed and developed by [Vansh Gupta](https://github.com/vanshxgupta)
