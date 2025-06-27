@@ -7,12 +7,12 @@ import {
   SandpackLayout,
   SandpackProvider,
 } from "@codesandbox/sandpack-react";
-import { aquaBlue, gruvboxDark,sandpackDark } from "@codesandbox/sandpack-themes";
+import { aquaBlue,amethyst} from "@codesandbox/sandpack-themes";
 import Constants from "@/data/Constants";
 
 function CodeEditor({ codeResp, isReady }: any) {
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const theme = isDarkMode ? gruvboxDark : aquaBlue;
+  const theme = isDarkMode ? amethyst : aquaBlue;
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
@@ -37,6 +37,7 @@ function CodeEditor({ codeResp, isReady }: any) {
             showNavigator: true,
             showTabs: true,
             editorHeight: 600,
+            showLineNumbers: true, // ✅ Line numbers enabled here
           }}
           customSetup={{
             dependencies: {
@@ -62,12 +63,13 @@ function CodeEditor({ codeResp, isReady }: any) {
               ...Constants.DEPENDANCY,
             },
           }}
-          options={{
-            externalResources: ["https://cdn.tailwindcss.com"],
-          }}
         >
           <SandpackLayout>
-            <SandpackCodeEditor showTabs={true} style={{ height: "70vh" }} />
+            <SandpackCodeEditor
+              showTabs={true}
+              showLineNumbers={true} 
+              style={{ height: "70vh" }}
+            />
           </SandpackLayout>
         </SandpackProvider>
       )}
