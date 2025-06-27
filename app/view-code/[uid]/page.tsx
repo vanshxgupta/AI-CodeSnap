@@ -23,12 +23,12 @@ function ViewCode() {
   const { uid } = useParams();
   const [loading, setLoading] = useState(false);
   const [codeResp, setCodeResp] = useState("");
-  const [record, setRecord] = useState<RECORD | null>();
+  const [record, setRecord] = useState<RECORD | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      uid && GetRecordInfo();
+    if (typeof window !== "undefined" && uid) {
+      GetRecordInfo();
     }
   }, [uid]);
 
@@ -37,80 +37,100 @@ function ViewCode() {
     setCodeResp("");
     setLoading(true);
 
-    const result = await axios.get("/api/wireframe-to-code?uid=" + uid);
-    const resp = result?.data;
-    setRecord(resp);
+    try {
+      const result = await axios.get(`/api/wireframe-to-code?uid=${uid}`);
+      const resp: RECORD = result?.data;
+      setRecord(resp);
 
-    if (resp?.code == null || regen) {
-      GenerateCode(resp);
-    } else {
-      setCodeResp(resp?.code?.resp);
+      if (!resp?.code || regen) {
+        GenerateCode(resp);
+      } else {
+        setCodeResp(resp.code.resp);
+        setIsReady(true);
+        setLoading(false);
+      }
+
+      // Optionally handle missing or invalid record here if needed
+      // For example:
+      // if (!resp) {
+      //   console.log("No Record Found");
+      // }
+    } catch (error) {
+      console.error("Error fetching record:", error);
       setLoading(false);
-      setIsReady(true);
-    }
-
-    if (resp?.error) {
-      console.log("No Record Found");
     }
   };
 
   const GenerateCode = async (record: RECORD) => {
     setLoading(true);
-    const res = await fetch("/api/ai-model", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: record?.description + ":" + Constants.PROMPT,
-        model: record.model,
-        imageUrl: record?.imageUrl,
-      }),
-    });
 
-    if (!res.body) return;
-    setLoading(false);
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    try {
+      const res = await fetch("/api/ai-model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: `${record.description}:${Constants.PROMPT}`,
+          model: record.model,
+          imageUrl: record.imageUrl,
+        }),
+      });
 
-      const text = decoder
-        .decode(value)
-        .replace(/```(jsx|javascript)?/g, "")
-        .replace(/```/g, "");
+      if (!res.body) return;
 
-      setCodeResp((prev) => prev + text);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let completeText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        completeText += decoder
+          .decode(value)
+          .replace(/```(jsx|javascript)?/g, "")
+          .replace(/```/g, "");
+      }
+
+      setCodeResp(completeText);
+      setIsReady(true);
+      UpdateCodeToDb(record, completeText);
+    } catch (error) {
+      console.error("Code generation error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setIsReady(true);
-    UpdateCodeToDb();
   };
 
   useEffect(() => {
-    if (codeResp !== "" && record?.uid && isReady && record?.code == null) {
-      UpdateCodeToDb();
+    if (codeResp && record?.uid && isReady && !record?.code) {
+      UpdateCodeToDb(record, codeResp);
     }
   }, [codeResp, record, isReady]);
 
-  const UpdateCodeToDb = async () => {
-    await axios.put("/api/wireframe-to-code", {
-      uid: record?.uid,
-      codeResp: { resp: codeResp },
-    });
+  const UpdateCodeToDb = async (record: RECORD, code: string) => {
+    try {
+      await axios.put("/api/wireframe-to-code", {
+        uid: record.uid,
+        codeResp: { resp: code },
+      });
+    } catch (error) {
+      console.error("Failed to update DB:", error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <AppHeader hideSidebar={true} />
+      <AppHeader hideSidebar />
       <div className="px-4 sm:px-6 lg:px-10 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Sidebar Info */}
           <div className="col-span-1">
-            <SelectionDetail
-              record={record}
-              regenrateCode={() => GetRecordInfo(true)}
-              isReady={isReady}
-            />
+            {record && (
+              <SelectionDetail
+                record={record}
+                regenrateCode={() => GetRecordInfo(true)}
+                isReady={isReady}
+              />
+            )}
           </div>
 
           {/* Code Editor */}
